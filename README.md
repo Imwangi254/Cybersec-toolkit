@@ -36,3 +36,49 @@ Total failed attempts:
 - Modern Kali uses journalctl for logging instead of a flat /var/log/auth.log file
 - Parsing structured text with grep -oP, sort, and uniq -c
 - Debugging real permission and authentication issues (sudo, GitHub PATs)
+
+
+## port_scanner.sh
+A Bash script that scans a target host for open TCP ports using `/dev/tcp`.
+
+### What it does
+- Takes a target IP and a port range as input
+- Attempts a TCP connection to each port in the range
+- Reports which ports are open
+
+### Usage
+cd bash
+chmod +x port_scanner.sh
+./port_scanner.sh
+
+### Example output
+Port 22: OPEN
+
+## port_scanner.py
+A Python TCP port scanner covering the same functionality as the Bash version, built to compare approaches across languages.
+
+### What it does
+- Takes a target IP, start port, and end port as command-line arguments
+- Uses Python's `socket` module to attempt a connection to each port
+- Reports open ports and a summary at the end
+
+### Usage
+cd python
+python3 port_scanner.py <target_ip> <start_port> <end_port>
+
+Example:
+python3 port_scanner.py 127.0.0.1 1 100
+
+### Example output
+=== Python Port Scanner ===
+Target: 127.0.0.1
+Port range: 1-100
+Port 22: OPEN
+----------------------------------------
+Total open ports found: 1
+Open ports: [22]
+
+### What I learned
+- Using Python's socket module and connect_ex() to test TCP ports
+- Handling command-line arguments with sys.argv
+- Comparing how Bash and Python approach the same networking task
