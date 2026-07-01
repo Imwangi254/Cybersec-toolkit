@@ -82,4 +82,3 @@ Open ports: [22]
 - Using Python's socket module and connect_ex() to test TCP ports
 - Handling command-line arguments with sys.argv
 - Comparing how Bash and Python approach the same networking task
-<!-- test commit -->
