@@ -82,3 +82,33 @@ Open ports: [22]
 - Using Python's socket module and connect_ex() to test TCP ports
 - Handling command-line arguments with sys.argv
 - Comparing how Bash and Python approach the same networking task
+## header_grabber.py
+A Python HTTP header grabber for passive web reconnaissance. Fetches a target's HTTP response headers and flags security-relevant findings.
+### What it does
+- Prompts the user for a target URL
+- Uses the `requests` module to fetch the site's HTTP response headers
+- Prints all response headers
+- Identifies the server software from the `Server` header
+- Flags missing security headers (HSTS, Content-Security-Policy, X-Frame-Options)
+- Handles connection errors gracefully instead of crashing
+### Usage
+cd python
+python3 header_grabber.py
+Then enter a URL when prompted (e.g. https://example.com).
+### Example output
+----------------------------------------
+Headers for: https://example.com
+----------------------------------------
+Server : cloudflare
+...
+----------------------------------------
+Findings:
+[i] Server software: cloudflare
+[-] Missing security header: Strict-Transport-Security
+[-] Missing security header: Content-Security-Policy
+[-] Missing security header: X-Frame-Options
+### What I learned
+- Reading HTTP response headers as a source of recon intelligence
+- Identifying server software and detecting missing security headers
+- Handling network errors with try/except (RequestException)
+- Interpreting connection errors (DNS resolution failures vs refused vs timeout)
