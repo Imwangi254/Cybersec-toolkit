@@ -112,3 +112,32 @@ Findings:
 - Identifying server software and detecting missing security headers
 - Handling network errors with try/except (RequestException)
 - Interpreting connection errors (DNS resolution failures vs refused vs timeout)
+## whois_lookup.py
+A Python WHOIS lookup tool for passive domain reconnaissance. Queries public registry data for a domain and presents a clean intelligence report.
+### What it does
+- Prompts the user for a target domain
+- Uses the `python-whois` library to query registry data
+- Reports registrar, creation/expiration/updated dates, and name servers
+- Flags whether registrant contact info is exposed or redacted
+- Detects non-existent domains and reports honestly instead of showing empty data
+- Handles lookup errors gracefully instead of crashing
+### Usage
+cd python
+python3 whois_lookup.py
+Then enter a domain when prompted (e.g. example.com). Enter the domain only, not a full URL.
+### Example output
+----------------------------------------
+WHOIS Report for: example.com
+----------------------------------------
+Registrar: RESERVED-Internet Assigned Numbers Authority
+Creation date: 1995-08-14 04:00:00
+Name servers:
+  - ELLIOTT.NS.CLOUDFLARE.COM
+----------------------------------------
+Findings:
+[i] Registrant contact info is redacted or private
+### What I learned
+- WHOIS as the most passive form of recon (never touches the target)
+- Reading domain age and redacted fields as intelligence signals
+- Extracting specific fields from a structured result object
+- Making a tool honest: distinguishing "private data" from "no domain found"
