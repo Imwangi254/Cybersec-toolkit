@@ -141,3 +141,34 @@ Findings:
 - Reading domain age and redacted fields as intelligence signals
 - Extracting specific fields from a structured result object
 - Making a tool honest: distinguishing "private data" from "no domain found"
+## subdomain_enum.py
+A Python subdomain enumeration tool for passive reconnaissance. Discovers subdomains of a target by querying public Certificate Transparency logs via crt.sh, without ever touching the target's infrastructure.
+### What it does
+- Prompts the user for a target domain
+- Queries the crt.sh Certificate Transparency log API for certificates issued to the domain
+- Extracts subdomains from certificate records and removes duplicates using a set
+- Filters out wildcards, email addresses, lookalike domains, and the root domain itself
+- Prints a clean, sorted list of unique subdomains with a total count
+- Handles request failures and unreadable responses gracefully
+### Usage
+cd python
+python3 subdomain_enum.py
+Then enter a domain when prompted (e.g. example.com). Enter the domain only, not a full URL.
+### Example output
+----------------------------------------
+Subdomains found for: example.com
+----------------------------------------
+dev.example.com
+m.example.com
+products.example.com
+support.example.com
+www.example.com
+----------------------------------------
+Total unique subdomains: 5
+### What I learned
+- Certificate Transparency logs as a passive source of subdomain intelligence
+- Passive vs active enumeration and why passive is safe and legal
+- Using a set to automatically de-duplicate results
+- Filtering messy real-world data (newlines, wildcards, lookalike domains)
+- The leading-dot check that distinguishes a true subdomain from a lookalike (e.g. testexample.com)
+- Layered error handling for network requests vs unreadable responses
