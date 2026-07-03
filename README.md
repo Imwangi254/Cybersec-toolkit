@@ -172,3 +172,38 @@ Total unique subdomains: 5
 - Filtering messy real-world data (newlines, wildcards, lookalike domains)
 - The leading-dot check that distinguishes a true subdomain from a lookalike (e.g. testexample.com)
 - Layered error handling for network requests vs unreadable responses
+## recon.py
+A passive reconnaissance suite that combines the header grabber, WHOIS lookup, and subdomain enumerator into a single tool. Takes one domain and runs all three recon tasks in sequence, producing one combined report.
+### What it does
+- Prompts the user for a target domain once
+- Runs three recon functions against it in sequence:
+  - HTTP header grab (server software, missing security headers)
+  - WHOIS lookup (registrar, dates, name servers)
+  - Subdomain enumeration via crt.sh Certificate Transparency logs
+- Each section is clearly separated with headers
+- Resilient by design: if one section fails, the others still run
+### Usage
+cd python
+python3 recon.py
+Then enter a domain when prompted (e.g. example.com).
+### Example output
+==================================================
+HTTP HEADERS
+==================================================
+[i] Server software: cloudflare
+[-] Missing security header: Strict-Transport-Security
+==================================================
+WHOIS
+==================================================
+Registrar: RESERVED-Internet Assigned Numbers Authority
+==================================================
+SUBDOMAINS
+==================================================
+dev.example.com
+Total unique subdomains: 5
+### What I learned
+- Functions: packaging code into named, reusable, callable units
+- Passing a parameter (domain) into functions instead of asking for input in each
+- Using return instead of exit() so one failing section does not kill the whole run
+- Composition: combining separate tools into a single suite
+- Building incrementally in stages and testing after each one
