@@ -1,6 +1,20 @@
 # Cybersec-toolkit
 Growing collection of Bash and Python tools built while learning cybersecurity through Africahackon's AH200 program.
 
+## Tools at a glance
+
+| Tool | Language | Purpose |
+|------|----------|---------|
+| `bash/failed_logins.sh` | Bash | Summarise failed SSH logins from the journal |
+| `bash/port_scanner.sh` | Bash | TCP port scanner using /dev/tcp |
+| `python/port_scanner.py` | Python | TCP port scanner (socket module) |
+| `python/header_grabber.py` | Python | Grab HTTP headers, flag missing security headers |
+| `python/whois_lookup.py` | Python | Passive WHOIS domain recon |
+| `python/subdomain_enum.py` | Python | Subdomain discovery via Certificate Transparency |
+| `python/recon.py` | Python | Combined passive recon suite |
+| `log-detector/detector.py` | Python | SSH intrusion detector (brute-force + breach) |
+| `misconfig-scanner/scanner.py` | Python | Local security misconfiguration auditor |
+
 ## failed_logins.sh
 
 A Bash script that scans the systemd journal for failed SSH login attempts and summarizes the results.
@@ -207,3 +221,47 @@ Total unique subdomains: 5
 - Using return instead of exit() so one failing section does not kill the whole run
 - Composition: combining separate tools into a single suite
 - Building incrementally in stages and testing after each one
+
+## log-detector/detector.py
+
+An SSH log intrusion detector that analyses authentication logs to detect brute-force attacks and possible breaches, with timestamped alerting and deduplication.
+
+### What it does
+- Reads an SSH auth log line by line and isolates failed/successful logins
+- Groups events per source IP and applies a sliding time window (measures *rate*, not just count)
+- Detects brute-force attacks (5+ failures from one IP within 2 minutes)
+- Detects possible breaches (a successful login from an IP that also had many failures)
+- Writes timestamped alerts to a persistent `alerts.log`
+- Deduplicates so the same alert is not reported twice
+
+### Usage
+cd log-detector
+python3 detector.py
+
+### What I learned
+- The read -> reason -> report loop that underpins all detection tools
+- Rate-based detection using sliding time windows, not just raw counts
+- The false-positive / false-negative trade-off (threshold tuning and alert fatigue)
+- Alert deduplication with a persistent state file
+- Testing detection logic *both ways*: proving it stays silent on normal activity and fires on real attacks
+
+## misconfig-scanner/scanner.py
+
+A local misconfiguration scanner - the on-host equivalent of a Cloud Security Posture Management (CSPM) scan. Audits the system for common security misconfigurations that mirror the classes of problems behind most cloud breaches.
+
+### What it does
+- Checks sensitive files (e.g. /etc/shadow) for world-readable permissions
+- Parses /etc/ssh/sshd_config for the PermitRootLogin policy, correctly ignoring commented-out lines
+- Inspects listening sockets (via `ss`) and flags risky services exposed on all interfaces (FTP, Telnet, databases), treating SSH as informational
+- Reports findings with graded severity: RISK / WARN / INFO / OK
+
+### Usage
+cd misconfig-scanner
+python3 scanner.py
+
+### What I learned
+- Proactive ("shift-left") security: finding open doors before an attacker does
+- Reading Linux permission bits in code (stat / S_IROTH) - the local twin of a public S3 bucket
+- Parsing config files safely (skipping comments) and driving system commands from Python (subprocess)
+- Graded severity instead of flagging everything equally, to reduce false-positive noise
+- How on-host checks map directly to cloud CSPM concepts (0.0.0.0 exposure = security group open to the internet)
