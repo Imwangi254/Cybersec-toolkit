@@ -1,0 +1,7 @@
+# Runtime output - generated when the tool runs, never commit
+alerts.log
+seen_alerts.txt
+
+# Python cruft
+__pycache__/
+*.pyc
