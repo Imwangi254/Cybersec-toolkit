@@ -20,6 +20,7 @@ Growing collection of Bash and Python tools built while learning cybersecurity t
 | `web-vuln-scanner/scanner.py` | Python | Scan a site for missing headers and exposed files |
 | `ip-lookup/iplookup.py` | Python | Look up IP geolocation and ownership via REST API |
 | `scam-detector/scamcheck.py` | Python | Detect Kenyan SMS/mobile-money scams and phishing links |
+| `scam-detector-web/app.py` | Python/Flask | Web-app version of the scam detector |
 
 ## failed_logins.sh
 
