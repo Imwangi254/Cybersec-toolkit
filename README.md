@@ -15,6 +15,7 @@ Growing collection of Bash and Python tools built while learning cybersecurity t
 | `log-detector/detector.py` | Python | SSH intrusion detector (brute-force + breach) |
 | `misconfig-scanner/scanner.py` | Python | Local security misconfiguration auditor |
 | `file-integrity-monitor/fim.py` | Python | Detect file tampering via SHA-256 baselines |
+| `password-auditor/auditor.py` | Python | Audit password strength and check breaches (k-anonymity) |
 
 ## failed_logins.sh
 
