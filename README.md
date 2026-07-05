@@ -19,6 +19,7 @@ Growing collection of Bash and Python tools built while learning cybersecurity t
 | `hash-cracker/cracker.py` | Python | Dictionary attack on password hashes (learning tool) |
 | `web-vuln-scanner/scanner.py` | Python | Scan a site for missing headers and exposed files |
 | `ip-lookup/iplookup.py` | Python | Look up IP geolocation and ownership via REST API |
+| `scam-detector/scamcheck.py` | Python | Detect Kenyan SMS/mobile-money scams and phishing links |
 
 ## failed_logins.sh
 
