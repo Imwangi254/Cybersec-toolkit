@@ -1,0 +1,7 @@
+# Runtime/machine-specific data - never commit
+baseline.json
+testfile.txt
+
+# Python cruft
+__pycache__/
+*.pyc
