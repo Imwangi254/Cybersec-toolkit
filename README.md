@@ -17,6 +17,7 @@ Growing collection of Bash and Python tools built while learning cybersecurity t
 | `file-integrity-monitor/fim.py` | Python | Detect file tampering via SHA-256 baselines |
 | `password-auditor/auditor.py` | Python | Audit password strength and check breaches (k-anonymity) |
 | `hash-cracker/cracker.py` | Python | Dictionary attack on password hashes (learning tool) |
+| `web-vuln-scanner/scanner.py` | Python | Scan a site for missing headers and exposed files |
 
 ## failed_logins.sh
 
