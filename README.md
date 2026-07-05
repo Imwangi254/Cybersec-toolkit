@@ -18,6 +18,7 @@ Growing collection of Bash and Python tools built while learning cybersecurity t
 | `password-auditor/auditor.py` | Python | Audit password strength and check breaches (k-anonymity) |
 | `hash-cracker/cracker.py` | Python | Dictionary attack on password hashes (learning tool) |
 | `web-vuln-scanner/scanner.py` | Python | Scan a site for missing headers and exposed files |
+| `ip-lookup/iplookup.py` | Python | Look up IP geolocation and ownership via REST API |
 
 ## failed_logins.sh
 
