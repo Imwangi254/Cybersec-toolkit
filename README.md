@@ -14,6 +14,7 @@ Growing collection of Bash and Python tools built while learning cybersecurity t
 | `python/recon.py` | Python | Combined passive recon suite |
 | `log-detector/detector.py` | Python | SSH intrusion detector (brute-force + breach) |
 | `misconfig-scanner/scanner.py` | Python | Local security misconfiguration auditor |
+| `file-integrity-monitor/fim.py` | Python | Detect file tampering via SHA-256 baselines |
 
 ## failed_logins.sh
 
