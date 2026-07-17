@@ -95,7 +95,8 @@ build.
 | `scam_patterns.py` | Weighted marker definitions + thresholds (tune here) |
 | `signals.py` | Tier 2: sender-impersonation + URL (lookalike/shortener/IP) checks |
 | `scam_detector.py` | Core engine: `analyse(message, sender="")` |
-| `scam_cli.py` | Command-line front-end (`-m`, `-f`, stdin, `--json`) |
+| `scam_cli.py` | Command-line front-end (`-m`, `-f`, `-s`, stdin, `--json`) |
+| `app.py` | Flask web app (`templates/index.html`) — paste-and-check UI |
 | `test_samples.py` | Quick hardcoded smoke test (pass/fail) |
 | `evaluate.py` | Corpus-driven evaluation: precision / recall / F1 |
 | `samples.csv` | Labelled corpus (`label,message`) — grow this with real data |
@@ -120,6 +121,23 @@ python3 scam_cli.py -s "+254712345678" -m "Safaricom: confirm your PIN"
 ```
 
 Exit codes signal risk for scripting: `0` = LOW, `1` = MEDIUM, `2` = HIGH.
+
+### Web app
+
+A single-page interface for non-technical users — paste a suspicious SMS,
+get a colour-coded verdict with plain-language reasons. English and Kiswahili.
+
+```bash
+pip install -r requirements.txt
+python3 app.py
+# open http://127.0.0.1:5000
+```
+
+The UI mirrors a phone message, uses a traffic-light verdict (green/amber/red),
+and shows the same explainable reasons as the CLI plus the sender/URL signal
+breakdown. It adds no detection logic of its own — it calls the same
+`analyse()` as every other interface. Runs locally on `127.0.0.1` by default;
+expose on your network only after adding rate limiting.
 
 ### As a library
 
