@@ -60,6 +60,34 @@ Content, sender and URL are scored as **separate signals** that feed one
 combined verdict — each reports its own findings, so the reasoning stays
 transparent (the report shows `content N + sender N + url N`).
 
+## Bilingual coverage: Swahili & Sheng (Tier 3)
+
+Generic scam detectors are English-only, so a Kenyan scam written in Swahili —
+"*tuma pin yako ya M-Pesa haraka*" — sails straight through them. This tool
+carries Swahili/Sheng terms alongside the English patterns in every category,
+scored identically. Examples now caught:
+
+| Swahili phrase | Meaning | Category |
+|---|---|---|
+| `tuma pin yako` | send your PIN | credential |
+| `namba ya siri` | secret number (PIN) | credential |
+| `haraka`, `sasa hivi` | quickly, right now | urgency |
+| `imefungwa` | (account) has been blocked | urgency |
+| `umeshinda`, `zawadi`, `bahati` | you've won, prize, luck | bait |
+| `mkopo`, `nafasi ya kazi` | loan, job opportunity | bait |
+| `sambaza` | forward/spread | share plea |
+
+Term choices are grounded in Kenyan mobile-money fraud reporting (M-Pesa
+impersonation, lucky-draw, loan/job-offer scams). A benign Swahili M-Pesa
+confirmation is included in the corpus as a false-positive control.
+
+**Known gap (not yet solved):** advance-fee *job-offer* scams that only carry
+bait + "send money to this number" (no urgency, no credential ask) can still
+score LOW — e.g. "*Nafasi ya kazi... tuma KES 500 kwa hii number*". The right
+fix is a considered "unsolicited offer + pay a personal number" rule validated
+against real samples, not a weight hack to pass one test. Logged for a future
+build.
+
 ## Files
 
 | File | Purpose |
