@@ -36,6 +36,30 @@ your PIN" (a safety reminder) the same as "share your PIN" (an attack). This
 tool detects protective phrasing and suppresses the credential hit, eliminating
 that whole class of false positive.
 
+## Beyond the body: sender & URL signals (Tier 2)
+
+The message text is only half the story. Two of the strongest signals live
+*outside* the words, in `signals.py`:
+
+**Sender mismatch** (`--sender`). Real M-Pesa comes from the sender ID `MPESA`;
+a scam claiming to be M-Pesa comes from `+2547...`. When a body name-drops an
+institution but the sender is a personal number, that mismatch scores heavily
+(+6) — identical scam text scores LOW from `MPESA` and MEDIUM from a mobile
+number.
+
+**URL heuristics.** Any link is inspected (never fetched):
+
+| Tell | Weight | Example |
+|---|---|---|
+| Raw IP address | 5 | `http://196.201.45.10/login` |
+| Lookalike domain | 5 | `safaricom-verify.xyz` vs `safaricom.co.ke` |
+| URL shortener | 2 | `bit.ly/x` hides the destination |
+| Disposable TLD | 2 | `.xyz`, `.top`, `.tk` |
+
+Content, sender and URL are scored as **separate signals** that feed one
+combined verdict — each reports its own findings, so the reasoning stays
+transparent (the report shows `content N + sender N + url N`).
+
 ## Files
 
 | File | Purpose |

@@ -34,6 +34,8 @@ def main():
     src = parser.add_mutually_exclusive_group()
     src.add_argument("-m", "--message", help="Message text to analyse")
     src.add_argument("-f", "--file", help="Path to a file containing the message")
+    parser.add_argument("-s", "--sender", default="",
+                        help="Sender ID or phone number (enables sender checks)")
     parser.add_argument("--json", action="store_true",
                         help="Output raw JSON instead of a formatted report")
     args = parser.parse_args()
@@ -53,7 +55,7 @@ def main():
     else:
         parser.error("Provide a message with -m, -f, or via stdin.")
 
-    result = analyse(message)
+    result = analyse(message, sender=args.sender)
 
     if args.json:
         print(json.dumps({"message": message, **result}, indent=2))

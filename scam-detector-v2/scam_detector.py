@@ -22,6 +22,7 @@ from scam_patterns import (
     CATEGORIES, THRESHOLDS, DANGER_COMBO, DANGER_COMBO_BONUS,
     PROTECTIVE_CONTEXT,
 )
+from signals import analyse_sender, analyse_urls
 
 _PROTECTIVE = [re.compile(p, re.IGNORECASE) for p in PROTECTIVE_CONTEXT]
 
@@ -39,9 +40,14 @@ _COMPILED = {
 }
 
 
-def analyse(message: str) -> dict:
+def analyse(message: str, sender: str = "") -> dict:
     """
     Analyse a single message.
+
+    Args:
+        message: the message body.
+        sender:  optional -- the sender ID or phone number the message came
+                 from. When supplied, sender/impersonation heuristics are added.
 
     Returns a dict:
         {
@@ -99,6 +105,27 @@ def analyse(message: str) -> dict:
             f"[+{DANGER_COMBO_BONUS}] -- this is the classic attack pattern."
         )
 
+    content_score = score  # snapshot before Tier 2 signals
+
+    # Tier 2 -- signals outside the message body.
+    sender_result = analyse_sender(message, sender)
+    if sender_result["score"]:
+        score += sender_result["score"]
+    for f in sender_result["flags"]:
+        explanation.append(f"Sender check: {f}")
+
+    url_result = analyse_urls(message)
+    if url_result["score"]:
+        score += url_result["score"]
+    for f in url_result["flags"]:
+        explanation.append(f"URL check: {f}")
+
+    signals = {
+        "content": content_score,
+        "sender": sender_result["score"],
+        "url": url_result["score"],
+    }
+
     if score >= THRESHOLDS["high"]:
         risk = "HIGH"
         verdict = "HIGH RISK -- very likely a scam. Do not respond or share any code."
@@ -115,6 +142,7 @@ def analyse(message: str) -> dict:
         "verdict": verdict,
         "categories": hits,
         "combo": combo,
+        "signals": signals,
         "explanation": explanation,
     }
 
@@ -128,6 +156,10 @@ def format_report(message: str, result: dict) -> str:
         preview = preview[:67] + "..."
     lines.append(f"Message : {preview}")
     lines.append(f"Score   : {result['score']}")
+    sig = result.get("signals")
+    if sig:
+        lines.append(f"          (content {sig['content']} + "
+                     f"sender {sig['sender']} + url {sig['url']})")
     lines.append(f"Risk    : {result['risk']}")
     lines.append(f"Verdict : {result['verdict']}")
     if result["explanation"]:
