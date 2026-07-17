@@ -41,9 +41,12 @@ that whole class of false positive.
 | File | Purpose |
 |---|---|
 | `scam_patterns.py` | Weighted marker definitions + thresholds (tune here) |
-| `scam_detector.py` | Core engine: `analyse()` and `format_report()` |
+| `signals.py` | Tier 2: sender-impersonation + URL (lookalike/shortener/IP) checks |
+| `scam_detector.py` | Core engine: `analyse(message, sender="")` |
 | `scam_cli.py` | Command-line front-end (`-m`, `-f`, stdin, `--json`) |
-| `test_samples.py` | Labelled test harness with accuracy reporting |
+| `test_samples.py` | Quick hardcoded smoke test (pass/fail) |
+| `evaluate.py` | Corpus-driven evaluation: precision / recall / F1 |
+| `samples.csv` | Labelled corpus (`label,message`) — grow this with real data |
 
 ## Usage
 
@@ -59,6 +62,9 @@ echo "You won a prize, click http://bit.ly/x" | python3 scam_cli.py
 
 # JSON output for chaining into other tools
 python3 scam_cli.py -m "..." --json
+
+# With sender check (flags brand impersonation from personal numbers)
+python3 scam_cli.py -s "+254712345678" -m "Safaricom: confirm your PIN"
 ```
 
 Exit codes signal risk for scripting: `0` = LOW, `1` = MEDIUM, `2` = HIGH.
@@ -73,27 +79,44 @@ print(result["risk"])          # HIGH
 print(result["explanation"])   # list of plain-language reasons
 ```
 
-## Testing
+## Testing & evaluation
+
+Two harnesses:
 
 ```bash
+# Quick smoke test (hardcoded samples, pass/fail)
 python3 test_samples.py -v
+
+# Full evaluation on a labelled corpus (precision / recall / F1)
+python3 evaluate.py                  # uses samples.csv
+python3 evaluate.py -c my.csv        # custom corpus
+python3 evaluate.py --errors-only    # show only the mistakes, with reasons
 ```
 
-The harness reports accuracy, **false positives** (legit flagged as scam) and
-**false negatives** (scam missed). False positives are the metric that matters:
-a detector that flags real bank/M-Pesa messages is useless in practice.
+**Why precision and recall, not just accuracy:** a single accuracy % hides *how*
+you fail. Precision = of the messages flagged, how many were truly scams (low
+precision means false alarms on real bank/M-Pesa texts). Recall = of the real
+scams, how many were caught (low recall means dangerous misses). For a scam
+detector, watch **precision** hardest — flagging legitimate messages destroys
+user trust faster than the occasional miss.
 
-Current labelled set: **14/14 correct (0 false positives, 0 false negatives).**
+**Growing the corpus is the most important next step.** The seed `samples.csv`
+is hand-written, so it shares the same assumptions as the rules and can't reveal
+their blind spots. Paste *real* scam SMS and *real* bank/M-Pesa/delivery
+messages into `samples.csv` (no code change needed) and re-run `evaluate.py`.
+The weights in `scam_patterns.py` are only truly validated once they survive
+messages they weren't built from.
 
 ## Roadmap
 
-- [ ] Expand the labelled corpus with real-world samples (the weights should be
-      tuned against genuine scam SMS *and* real bank/M-Pesa messages).
-- [ ] Sender heuristics: flag "claims to be M-Pesa but sender is a personal
-      number" — a very strong, cheap signal.
-- [ ] URL analysis: lookalike domains (`safaricom-verify.com`) and shortener
-      expansion.
-- [ ] Optional Flask front-end (see the existing web-app wrapper in the repo).
+- [x] Corpus-driven evaluation (`evaluate.py`) with precision/recall/F1.
+- [x] Sender heuristics: flag "claims to be M-Pesa but sender is a personal
+      number" (`signals.py`).
+- [x] URL analysis: lookalike domains, shorteners, raw-IP links (`signals.py`).
+- [ ] Grow `samples.csv` with real-world scam + legit messages (highest value).
+- [ ] Swahili / Sheng coverage ("tuma pin yako", "akaunti imefungwa").
+- [ ] Hybrid ML tiebreaker for reworded scams the rules miss.
+- [ ] Flask front-end (see the existing web-app wrapper in the repo).
 
 ## Disclaimer
 
