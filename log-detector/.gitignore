@@ -5,3 +5,4 @@ seen_alerts.txt
 # Python cruft
 __pycache__/
 *.pyc
+auth.log
