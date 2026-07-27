@@ -1,27 +1,33 @@
-| `agentgate/` | Python | Authorization + audit control plane that vets and logs every action an AI agent takes |
-## agentgate
+# Cybersecurity Toolkit
 
-An authorization and audit control plane for AI agents. It sits between an agent and the tools it can call, and decides — per action — whether that action is allowed, needs a human's approval, or should be blocked, writing every decision to a tamper-evident log. Where the recon and scanner tools ask "is this system exposed?", AgentGate asks "should this agent be allowed to do this at all?"
+**Why this exists**
 
-### What it does
-- Intercepts every tool call an agent wants to make and evaluates it against a set of policies before it runs
-- Ships three policies, each mapped to a named OWASP LLM risk:
-  - **Tool allowlist** (default-deny): only explicitly permitted tools may run — blocks over-permissioned agents
-  - **Data egress**: blocks actions whose arguments carry emails, secrets, or card-like numbers
-  - **Human approval**: high-impact actions (delete, transfer, deploy) pause for a person to approve
-- Combines policy verdicts with "most restrictive wins", so a single deny blocks the action
-- Records every decision in a SHA-256 hash-chained provenance log that can be verified for tampering
-- Framework-agnostic core with adapters: a plain `@guard` decorator for any Python function, and a LangChain tool wrapper
+I built this toolkit to learn cybersecurity the only way that really sticks — by making things. Each project started as a question ("how does a port scanner actually work?", "how would you catch a brute-force attack?", "how do you stop an AI agent from doing something dangerous?") and became a small, working tool that answers it. The goal was never just to use security tools, but to understand them well enough to build my own.
 
-### Usage
-cd agentgate
-pip install -e '.[dev]'
-python examples/plain_example.py
-pytest -q
+The collection spans three sides of security: **offensive** (recon and scanning), **defensive** (detection and monitoring), and **AI security** (guarding autonomous agents). Every tool has its own README explaining what it does and what I learned building it.
 
-### What I learned
-- Authorization vs authentication: this tool answers "what is this agent *allowed to do*", the same question IAM asks of users in the cloud
-- Default-deny as a security posture — allowlisting is safer than blocklisting because the unknown case is blocked, not permitted
-- Tamper-evident logging with hash chaining: each log entry embeds the hash of the previous one, so any edit to the past breaks the chain
-- Designing a neutral core with pluggable adapters, so the tool isn't locked to one AI framework
-- Least privilege in practice, the hard way: pushing this repo, a scoped access token *refused* to write CI workflow files without the right permission — the exact principle AgentGate enforces on agents, enforced on me
+Built while learning through Africahackon's AH200 program.
+
+## Tools at a glance
+
+| Tool | Language | Purpose |
+|------|----------|---------|
+| [agentgate](agentgate/) | Python | Safety gatekeeper for AI agents: authorizes, approves, and logs every action |
+| [python/recon.py](python/) | Python | Passive recon suite: HTTP headers, WHOIS, and subdomain discovery |
+| [python/subdomain_enum.py](python/) | Python | Find subdomains passively via Certificate Transparency logs |
+| [python/header_grabber.py](python/) | Python | Grab HTTP headers and flag missing security headers |
+| [python/whois_lookup.py](python/) | Python | Passive WHOIS domain reconnaissance |
+| [web-vuln-scanner](web-vuln-scanner/) | Python | Scan a site for missing headers and exposed files |
+| [misconfig-scanner](misconfig-scanner/) | Python | Local security misconfiguration auditor (like an on-host CSPM) |
+| [log-detector](log-detector/) | Python | Detect SSH brute-force attacks and breaches from auth logs |
+| [file-integrity-monitor](file-integrity-monitor/) | Python | Detect file tampering using SHA-256 baselines |
+| [password-auditor](password-auditor/) | Python | Check password strength and breaches (k-anonymity) |
+| [hash-cracker](hash-cracker/) | Python | Dictionary attack on password hashes (learning tool) |
+| [ip-lookup](ip-lookup/) | Python | Look up IP geolocation and ownership via REST API |
+| [scam-detector](scam-detector/) | Python | Detect Kenyan SMS / mobile-money scams and phishing links |
+| [scam-detector-web](scam-detector-web/) | Python/Flask | Web version of the scam detector |
+| [bash/](bash/) | Bash | Failed-login summariser, TCP port scanner, and system automation |
+
+## A note on ethics
+
+These tools are for learning and for testing systems I own or am explicitly authorized to test. Recon and scanning against systems without permission is illegal — the skill includes knowing where that line is.
