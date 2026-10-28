@@ -6,7 +6,7 @@
 > MITRE ATT&CK technique, and the control that prevents it.
 >
 > **Author:** Peter Mwangi (GitHub: Imwangi254)
-> **Context:** Cloud Security 
+> **Context:** Cloud Security
 > **Date:** October 2026
 > **Tooling:** Kali Linux (VMware), AWS CLI v2, ScoutSuite, dig/host, git, curl
 
