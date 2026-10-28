@@ -5,7 +5,7 @@
 > Each level is mapped to the real-world breach it mirrors, the relevant
 > MITRE ATT&CK technique, and the control that prevents it.
 >
-> **Author:** Peter Ndirangu Mwangi (GitHub: Imwangi254)
+> **Author:** Peter Mwangi (GitHub: Imwangi254)
 > **Context:** Africahackon AH200 — Cloud Security module
 > **Date:** October 2026
 > **Tooling:** Kali Linux (VMware), AWS CLI v2, ScoutSuite, dig/host, git, curl
