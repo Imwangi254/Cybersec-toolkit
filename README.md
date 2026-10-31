@@ -31,3 +31,12 @@ Built while learning through Africahackon's AH200 program.
 ## A note on ethics
 
 These tools are for learning and for testing systems I own or am explicitly authorized to test. Recon and scanning against systems without permission is illegal — the skill includes knowing where that line is.
+
+
+
+## Cloud Security Write-ups
+
+Hands-on cloud penetration testing and hardening labs, documented end-to-end:
+
+- **[Insecure Azure Environment — Cloud Security Assessment](writeups/azure-insecure-cloud-lab.md)** — built a deliberately insecure Azure environment (VM, VNet, storage account, managed identity) and identified/analysed three findings (Identity · Network · Data) with exploitability, blast radius, remediation, and prioritization. Includes an architecture diagram.
+- **[flAWS.cloud Walkthrough](writeups/flaws-cloud-walkthrough.md)** — exploited six common AWS misconfigurations (public buckets, leaked keys in git history, public EBS snapshot, IMDS SSRF, IAM/Lambda enumeration), each mapped to a real-world breach and a MITRE ATT&CK technique, with the controls that prevent each one.
