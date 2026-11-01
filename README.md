@@ -40,3 +40,6 @@ Hands-on cloud penetration testing and hardening labs, documented end-to-end:
 
 - **[Insecure Azure Environment — Cloud Security Assessment](writeups/azure-insecure-cloud-lab.md)** — built a deliberately insecure Azure environment (VM, VNet, storage account, managed identity) and identified/analysed three findings (Identity · Network · Data) with exploitability, blast radius, remediation, and prioritization. Includes an architecture diagram.
 - **[flAWS.cloud Walkthrough](writeups/flaws-cloud-walkthrough.md)** — exploited six common AWS misconfigurations (public buckets, leaked keys in git history, public EBS snapshot, IMDS SSRF, IAM/Lambda enumeration), each mapped to a real-world breach and a MITRE ATT&CK technique, with the controls that prevent each one.
+
+
+- **[Incident Response Playbook — Compromised Cloud VM & Identity](writeups/cloud-vm-compromise-ir-checklist.md)** — step-by-step IR workflow (Detect → Contain → Eradicate → Recover → Learn) for an attacker who breaches a VM via open SSH, steals an over-privileged identity, and deploys crypto-miners. The response side of the Azure lab attack chain.
