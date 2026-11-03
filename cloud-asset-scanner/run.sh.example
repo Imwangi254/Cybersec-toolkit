@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Copy to run.sh (gitignored) and fill in your own values.
+export TELEGRAM_BOT_TOKEN="8895524058:AAHBiIbuvK_d0Tch0MZ_Fn3RwpeETgfUI9Q"
+export TELEGRAM_CHAT_ID="719169621"
+cd /home/kali/cloud-asset-scanner
+/usr/bin/python3 scanner.py --i-am-authorized >> cron.log 2>&1

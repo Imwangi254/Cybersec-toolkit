@@ -1,0 +1,5 @@
+# Cloud Asset Scanner — targets
+# ONE target per line. Only assets you OWN or are AUTHORIZED to test.
+# Lines beginning with # are ignored.
+# https://mydomain.example
+# app.mydomain.example
