@@ -1,45 +1,88 @@
-# Cybersecurity Toolkit
+# 🛡️ Threat Intel & Outage Digest — n8n Automation
 
-**Why this exists**
+A self-hosted security automation that aggregates threat-intelligence news and
+cloud-outage alerts from multiple sources, de-duplicates them, and delivers a
+concise daily digest to Telegram. Built as a hands-on SOAR / security-automation
+exercise.
 
-I built this toolkit to learn cybersecurity the only way that really sticks — by making things. Each project started as a question ("how does a port scanner actually work?", "how would you catch a brute-force attack?", "how do you stop an AI agent from doing something dangerous?") and became a small, working tool that answers it. The goal was never just to use security tools, but to understand them well enough to build my own.
+## What it does
 
-The collection spans three sides of security: **offensive** (recon and scanning), **defensive** (detection and monitoring), and **AI security** (guarding autonomous agents). Every tool has its own README explaining what it does and what I learned building it.
+Every morning at **07:00**, the workflow:
 
-Built while learning through Africahackon's AH200 program.
+1. Pulls the latest articles from several security RSS feeds (news + vendor +
+   cloud status) in parallel.
+2. **Merges** them into a single stream.
+3. **De-duplicates** against previously-sent items, so only *new* articles go out.
+4. **Limits** to the top N headlines.
+5. Sends each as a message to a **Telegram** bot.
 
-## Tools at a glance
+The result is a personal "tl;dr sec"–style digest — plus early warning of major
+cloud incidents — delivered straight to your phone, fully hands-off.
 
-| Tool | Language | Purpose |
-|------|----------|---------|
-| [agentgate](agentgate/) | Python | Safety gatekeeper for AI agents: authorizes, approves, and logs every action |
-| [python/recon.py](python/) | Python | Passive recon suite: HTTP headers, WHOIS, and subdomain discovery |
-| [python/subdomain_enum.py](python/) | Python | Find subdomains passively via Certificate Transparency logs |
-| [python/header_grabber.py](python/) | Python | Grab HTTP headers and flag missing security headers |
-| [python/whois_lookup.py](python/) | Python | Passive WHOIS domain reconnaissance |
-| [web-vuln-scanner](web-vuln-scanner/) | Python | Scan a site for missing headers and exposed files |
-| [misconfig-scanner](misconfig-scanner/) | Python | Local security misconfiguration auditor (like an on-host CSPM) |
-| [log-detector](log-detector/) | Python | Detect SSH brute-force attacks and breaches from auth logs |
-| [file-integrity-monitor](file-integrity-monitor/) | Python | Detect file tampering using SHA-256 baselines |
-| [password-auditor](password-auditor/) | Python | Check password strength and breaches (k-anonymity) |
-| [hash-cracker](hash-cracker/) | Python | Dictionary attack on password hashes (learning tool) |
-| [ip-lookup](ip-lookup/) | Python | Look up IP geolocation and ownership via REST API |
-| [scam-detector](scam-detector/) | Python | Detect Kenyan SMS / mobile-money scams and phishing links |
-| [scam-detector-web](scam-detector-web/) | Python/Flask | Web version of the scam detector |
-| [bash/](bash/) | Bash | Failed-login summariser, TCP port scanner, and system automation |
+## Architecture
 
-## A note on ethics
+```
+Schedule Trigger (daily 07:00)
+        │
+        ├─► RSS: The Hacker News ──┐
+        ├─► RSS: BleepingComputer ─┤
+        ├─► RSS: Krebs on Security ┤
+        ├─► RSS: AWS Security Blog ─┤──►  Merge  ──►  Remove Duplicates  ──►  Limit  ──►  Telegram
+        ├─► RSS: Azure Status feed ─┤        (append)     (prev. executions)    (top N)      (bot)
+        └─► … additional feeds ─────┘
+```
 
-These tools are for learning and for testing systems I own or am explicitly authorized to test. Recon and scanning against systems without permission is illegal — the skill includes knowing where that line is.
+- **Merge** (append mode) combines every feed into one list.
+- **Remove Duplicates** keys on each article's `link` and remembers what it has
+  already sent across runs — no repeats day to day.
+- **Limit** caps the volume per run.
+- **Telegram** delivers `title + link` per item.
 
+## Sources
 
+| Feed | URL |
+|------|-----|
+| The Hacker News | `https://feeds.feedburner.com/TheHackersNews` |
+| BleepingComputer | `https://www.bleepingcomputer.com/feed/` |
+| Krebs on Security | `https://krebsonsecurity.com/feed/` |
+| AWS Security Blog | `https://aws.amazon.com/blogs/security/feed/` |
+| Azure Status (incidents) | `https://azure.status.microsoft/status/feed/` |
 
-## Cloud Security Write-ups
+Easily extended — add an `RSS Read` node, wire it to the trigger and Merge,
+bump Merge's input count.
 
-Hands-on cloud penetration testing and hardening labs, documented end-to-end:
+## Skills demonstrated
 
-- **[Insecure Azure Environment — Cloud Security Assessment](writeups/azure-insecure-cloud-lab.md)** — built a deliberately insecure Azure environment (VM, VNet, storage account, managed identity) and identified/analysed three findings (Identity · Network · Data) with exploitability, blast radius, remediation, and prioritization. Includes an architecture diagram.
-- **[flAWS.cloud Walkthrough](writeups/flaws-cloud-walkthrough.md)** — exploited six common AWS misconfigurations (public buckets, leaked keys in git history, public EBS snapshot, IMDS SSRF, IAM/Lambda enumeration), each mapped to a real-world breach and a MITRE ATT&CK technique, with the controls that prevent each one.
+- **SOAR / workflow automation** with n8n (self-hosted via Docker)
+- RSS aggregation, data merging, cross-run **de-duplication**
+- **Telegram Bot API** integration for alert delivery
+- Scheduling / unattended execution
+- Threat-intelligence collection & cloud service-health monitoring
 
+## Setup
 
-- **[Incident Response Playbook — Compromised Cloud VM & Identity](writeups/cloud-vm-compromise-ir-checklist.md)** — step-by-step IR workflow (Detect → Contain → Eradicate → Recover → Learn) for an attacker who breaches a VM via open SSH, steals an over-privileged identity, and deploys crypto-miners. The response side of the Azure lab attack chain.
+> No secrets are stored in this repository. You supply your own.
+
+1. Run n8n (Docker):
+   ```bash
+   docker run -d --name n8n --restart unless-stopped \
+     -p 5678:5678 -e GENERIC_TIMEZONE=Africa/Nairobi \
+     -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n
+   ```
+2. Open `http://localhost:5678` and import `security-digest.workflow.json`
+   (⋯ menu → **Import from File**).
+3. Create a **Telegram** credential with your bot token (from `@BotFather`).
+4. In the **Telegram** node, set **Chat ID** to your own
+   (replace the `YOUR_TELEGRAM_CHAT_ID` placeholder).
+5. Activate / **Publish** the workflow.
+
+## Notes
+
+- The Telegram bot token lives in n8n's encrypted credential store, **not** in
+  the exported workflow. The only value to sanitise before sharing is the
+  **Chat ID**.
+- The Azure Status feed is empty when healthy and only populates during a broad
+  incident — so it acts as an outage early-warning without adding daily noise.
+
+---
+*Built as part of hands-on blue-team / cloud-security study.*
